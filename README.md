@@ -2,6 +2,7 @@
    
 Firstly, I write image blurring code with non-shared memory for all pictures.
 
+ >>nvcc test.cu
  >> output.exe 1.ppm 1_out.ppm
 
 
