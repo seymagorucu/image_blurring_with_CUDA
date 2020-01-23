@@ -1,6 +1,4 @@
 
-
-
 #include "wb.h"
 #include <stdio.h>
 
@@ -34,14 +32,11 @@ void wbImage_save(const wbImage_t& image, const char* fName){
         delete [] rawData;
 }
 
-
 __global__ void without_shared_memory(float *input, float *output,  int height, int width, int channels, float* mask)
 {
-
 		
 int col = blockIdx.x * blockDim.x + threadIdx.x;  
 int row = blockIdx.y * blockDim.y + threadIdx.y;  
-
 
 for (int color = 0; color < channels; color++) 
 {
@@ -134,8 +129,6 @@ __global__ void with_shared_memory(float *input, float *output,  int height, int
 }
 
 
-
-
 int main(int argc, char ** argv) {
 
 	int nDevices;
@@ -174,17 +167,14 @@ int main(int argc, char ** argv) {
 	int imageChannels = wbImage_getChannels(inputImage);
 	
 	hostInputImageData = wbImage_getData(inputImage);
-    printf("%d %d %d\n", imageWidth, imageHeight, imageChannels);
-    printf("%f %f %f\n", hostInputImageData[0], hostInputImageData[1], hostInputImageData[2]);
+	
+  	printf("%d %d %d\n", imageWidth, imageHeight, imageChannels);
+  	printf("%f %f %f\n", hostInputImageData[0], hostInputImageData[1], hostInputImageData[2]);
 
-	
-	/*YOUR CODE HERE*/
-	
-    /*Just save the original image for now.*/
 	hostOutputImageData = hostInputImageData;
-    outputImage = wbImage_new(imageWidth, imageHeight, imageChannels);
-    outputImage.data = hostOutputImageData;
-    wbImage_save(outputImage, outputImageFile);
+  	outputImage = wbImage_new(imageWidth, imageHeight, imageChannels);
+	outputImage.data = hostOutputImageData;
+   	wbImage_save(outputImage, outputImageFile);
 
 
 	
@@ -198,9 +188,11 @@ int main(int argc, char ** argv) {
 	cudaMalloc((void **)&d_mask_data,mask_size);
 	
 	 float *hostMaskData = (float*)malloc(mask_size);
+	
 	for (int i = 0; i < (MASK_WIDTH * MASK_WIDTH) ; i++)
+	{
 		hostMaskData[i] = 1.0 / (MASK_WIDTH * MASK_WIDTH);
-		
+	}	
 	
 	cudaEvent_t start, stop;
 	cudaEventCreate(&start);
@@ -209,8 +201,7 @@ int main(int argc, char ** argv) {
 	
 	cudaMemcpy(d_input_image_data, hostInputImageData, image_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_mask_data, hostMaskData, mask_size, cudaMemcpyHostToDevice);
-	
-	
+		
 	
 	dim3 dimBlock(BLOCK_WIDTH, BLOCK_WIDTH, 1);
 	//dim3 dimBlock(TILE_WIDTH, TILE_WIDTH, 1);
